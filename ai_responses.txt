@@ -1,3 +1,0 @@
-Input: code for reverse string
-Output: {"tends_task":"False","reply":"The code for reverse string is: def reverse_string(s): return s[::-1]"}
-
