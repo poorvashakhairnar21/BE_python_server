@@ -15,7 +15,7 @@ def chat():
     user_message = data.get("message", "").strip().lower()
     
     analysis = json.loads(get_ai_response(user_message,BACKEND_API_URL))
-    # return jsonify(analysis)
+    # return jsonify({"reply": "testing"})
     
     if 'tends_task' in analysis:
         if analysis['tends_task'] == 'True':
@@ -23,7 +23,7 @@ def chat():
         else:
             return jsonify({"reply": analysis['reply']})
     else:
-        return jsonify({"reply": "Asking to do task."})
+        return jsonify({"reply": analysis})
     
     # {"command": "set alarm", "parameters": {"time": "10:00"}}
     # {"tends_task": "True", "comfirmation_massage": "Do you want to set the alarm for 07:00?", "command": "", "parameters": {}}

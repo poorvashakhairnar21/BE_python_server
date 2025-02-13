@@ -11,6 +11,6 @@ def get_client_response(message: str,API_URL:str) -> str:
         print("Error fetching AI response:", e)
         raise RuntimeError("Failed to fetch AI response") 
 
-massage = "play song"
+massage = "open notepad"
 
 print(get_client_response(massage,CLIENT_API_URL))

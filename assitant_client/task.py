@@ -6,72 +6,65 @@ import pyautogui
 # from PIL import Image
 # import cv2
 from datetime import datetime
-import speedtest
+from speedtest import Speedtest
 import subprocess
 import platform
+import time
 
 from assitant_client.utils import APP_PATHS
 
-
-def set_alarm():
+#done
+def set_alarm(alarm_time:str):
     """Function to set an alarm on a separate thread."""
-    def alarm_task():
-        alarm_time = input("Enter the alarm time in HH:MM format (24-hour): ")
-        
-        try:
-            alarm_hour, alarm_minute = map(int, alarm_time.split(":"))
-        except ValueError:
-            print("Invalid format! Use HH:MM (24-hour).")
-            return
-        
-        print(f"Alarm set for {alarm_time}. Running in background...")
-
+    def alarm_task(hour,minute):
         while True:
-            now = datetime.datetime.now()
-            if now.hour == alarm_hour and now.minute == alarm_minute:
+            now = datetime.now()
+            if now.hour == hour and now.minute == minute:
                 print("⏰ Alarm ringing!")
                 for _ in range(5):  # Beeps 5 times
                     winsound.Beep(1000, 1000)
                 break
             time.sleep(30)  # Check every 30 seconds
+            
+    try:
+        alarm_hour, alarm_minute = map(int, alarm_time.split(":"))
+        alarm_thread = threading.Thread(target=alarm_task,args=(alarm_hour,alarm_minute))
+        alarm_thread.start()
+        return(f"Alarm set for {alarm_time}.")
+    except ValueError:
+        return "Invalid format! Use HH:MM (24-hour). Try again."
 
-    alarm_thread = threading.Thread(target=alarm_task, daemon=True)
-    alarm_thread.start()
-
-def open_application(command):
+#done
+def open_application(app_name:str):
     """Function to open an application based on user command."""
-    
-    app_name = command.replace("open ", "").strip().lower()  # Extract app name
+    try:
+        if app_name in APP_PATHS:
+            subprocess.Popen(APP_PATHS[app_name], shell=True)  # No blocking, runs in the background
+            return f"Opening {app_name}..."
+        else:   
+            return f"Application '{app_name}' not found!"
+    except Exception as e:
+        return f"Facing some issues while opening {app_name}."
 
-    if app_name in APP_PATHS:
-        subprocess.Popen(APP_PATHS[app_name], shell=True)  # No blocking, runs in the background
-        return f"Opening {app_name}..."
-    else:
-        return f"Application '{app_name}' not found!"
-
-
+#done
 def take_screenshot():
     # Define the fixed folder name
-    folder_path = "screenshots"
-    
-    # Create the "screenshots" folder if it doesn't exist
-    os.makedirs(folder_path, exist_ok=True)
+    try:
+        folder_path = "screenshots"
+        
+        # Create the "screenshots" folder if it doesn't exist
+        os.makedirs(folder_path, exist_ok=True)
 
-    # Generate a unique filename using timestamp
-    timestamp = datetime.now().strftime("%Y-%m-%d")
-    filename = os.path.join(folder_path, f"screenshot_{timestamp}.png")
+        # Generate a unique filename using timestamp
+        timestamp = datetime.now().strftime("%Y-%m-%d")
+        filename = os.path.join(folder_path, f"screenshot_{timestamp}.png")
 
     # Capture and save the screenshot
-    screenshot = pyautogui.screenshot()
-    screenshot.save(filename)
-    print(f"Screenshot saved as {filename}")
-
-
-def take_photo():
-    pass
-
-def open_app(app_name):
-    pass
+        screenshot = pyautogui.screenshot()
+        screenshot.save(filename)
+        return f"Screenshot saved as {filename}"
+    except Exception as e:
+        return f"Facing some issues while taking screenshot."
 
 # def take_photo():
 #     # Create "photos" folder if it doesn't exist
@@ -106,23 +99,21 @@ def open_app(app_name):
 
 
 def get_internet_speed():
-    st = speedtest.Speedtest()
+    try:
+        st = Speedtest()
+        download_speed = st.download() / 1_000_000  # Convert from bits to Mbps
+        upload_speed = st.upload() / 1_000_000  # Convert from bits to Mbps
+        return f"Download Speed: {download_speed:.2f} Mbps\nUpload Speed: {upload_speed:.2f} Mbps"
+    except Exception as e:
+        return f"Facing some issues while checking internet speed."
 
-    print("Checking download speed...")
-    download_speed = st.download() / 1_000_000  # Convert from bits to Mbps
-
-    print("Checking upload speed...")
-    upload_speed = st.upload() / 1_000_000  # Convert from bits to Mbps
-
-    print(f"Download Speed: {download_speed:.2f} Mbps")
-    print(f"Upload Speed: {upload_speed:.2f} Mbps")
-
-    return download_speed, upload_speed
-
+#done
 def get_current_time():
-    current_time = datetime.now().strftime("%I:%M %p")  # 12-hour format with AM/PM
-    print(f"the current time is -> {current_time}")
-    return current_time
+    try:
+        current_time = datetime.now().strftime("%I:%M %p")  # 12-hour format with AM/PM
+        return f"The current time is {current_time}"
+    except Exception as e:
+        return f"Facing some issues while checking current time."
 
 def system_control(command):
     # Validate action
