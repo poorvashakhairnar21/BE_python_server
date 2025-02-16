@@ -156,10 +156,6 @@ def system_control(command):
     else:
         print("Invalid input. Please enter 'yes' or 'no'.")
 
-
-
-
-
 '''
 
 def open_spotify():

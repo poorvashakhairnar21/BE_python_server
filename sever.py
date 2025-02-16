@@ -3,6 +3,7 @@ from flask_cors import CORS
 from backend_request import get_ai_response
 import os
 import json
+from assitant_client.commands import COMMANDS
 
 app = Flask(__name__)
 CORS(app)  # Allow frontend requests (from React)
@@ -19,11 +20,18 @@ def chat():
     
     if 'tends_task' in analysis:
         if analysis['tends_task'] == 'True':
-            return jsonify({"reply": analysis['comfirmation_massage']})
+            return jsonify({"reply": analysis['comfirmation_message']})
         else:
             return jsonify({"reply": analysis['reply']})
     else:
-        return jsonify({"reply": analysis})
+        command = analysis['command']
+        parameters = analysis['parameters']
+        command_execute, _ = COMMANDS.get(command,"")
+    
+        if command_execute:
+            return jsonify({"reply": command_execute(**parameters)})
+        else:
+            return jsonify({"reply": "Command not found for task " + command})
     
     # {"command": "set alarm", "parameters": {"time": "10:00"}}
     # {"tends_task": "True", "comfirmation_massage": "Do you want to set the alarm for 07:00?", "command": "", "parameters": {}}
