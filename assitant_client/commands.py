@@ -4,7 +4,7 @@ COMMANDS = {
     "set alarm": [set_alarm,{"time": ""}],
     # "take photo": [take_photo,{}],
     "screenshot": [take_screenshot,{}],
-    # "internet speed": [get_internet_speed,{}],
+    "internet speed": [get_internet_speed,{}],
     "time": [get_current_time,{}],
     # "action": [system_control,{}], 
     "open": [open_application,{"app_name":""}],
@@ -18,5 +18,8 @@ COMMANDS = {
     # "close spotify": close_spotify,
     # "exit": exit,  # Can be handled separately
 }
+
+
+
 
 {'set alarm': {'time': ''},'take photo': {},'screenshot': {},'internet speed': {},'time': {},'action': {},'open': {'app_name': ''}}
