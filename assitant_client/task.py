@@ -11,7 +11,7 @@ import subprocess
 import platform
 import time
 
-from assitant_client.utils import APP_PATHS
+from assitant_client.utils import APP_PATHS, SYSTEM_CONTROL_COMMANDS  
 
 #done
 def set_alarm(alarm_time:str):
@@ -97,10 +97,10 @@ def take_screenshot():
 #     cv2.destroyAllWindows()
 
 
-
+#done
 def get_internet_speed():
     try:
-        st = Speedtest()
+        st = Speedtest(timeout=1)
         download_speed = st.download() / 1_000_000  # Convert from bits to Mbps
         upload_speed = st.upload() / 1_000_000  # Convert from bits to Mbps
         return f"Download Speed: {download_speed:.2f} Mbps\nUpload Speed: {upload_speed:.2f} Mbps"
@@ -115,13 +115,12 @@ def get_current_time():
     except Exception as e:
         return f"Facing some issues while checking current time."
 
+#halfdone
 def system_control(command):
     # Validate action
     if command not in ["shutdown", "sleep", "restart"]:
-        print("Invalid action. Please choose 'shutdown', 'sleep', or 'restart'.")
-        return
-
-    # Confirm the action
+        return "Invalid action. Please choose 'shutdown', 'sleep', or 'restart'."
+    
     print(f"Are you sure you want to {command} the system? (yes/no): ", end="")
     choice = input().lower()
 
@@ -129,32 +128,17 @@ def system_control(command):
         print(f"Proceeding with {command}...")
         time.sleep(2)  # Add delay to give user time to read
 
-        # Perform the chosen action
-        if platform.system() == "Windows":
-            if command == "shutdown":
-                os.system("shutdown /s /t 1")
-            elif command == "sleep":
-                os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
-            elif command == "restart":
-                os.system("shutdown /r /t 1")
-        elif platform.system() == "Darwin":  # macOS
-            if command == "shutdown":
-                os.system("sudo shutdown -h now")
-            elif command == "sleep":
-                os.system("pmset sleepnow")
-            elif command == "restart":
-                os.system("sudo shutdown -r now")
-        elif platform.system() == "Linux":
-            if command == "shutdown":
-                os.system("shutdown now")
-            elif command == "sleep":
-                os.system("systemctl suspend")
-            elif command == "restart":
-                os.system("reboot")
+        system_name = platform.system()
+
+        if system_name in SYSTEM_CONTROL_COMMANDS  and command in SYSTEM_CONTROL_COMMANDS [system_name]:
+            os.system(SYSTEM_CONTROL_COMMANDS [system_name][command])
+
     elif choice == "no":
         print("Action cancelled.")
     else:
         print("Invalid input. Please enter 'yes' or 'no'.")
+
+
 
 '''
 
