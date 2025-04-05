@@ -1,4 +1,5 @@
 import requests
+import sys
 
 CLIENT_API_URL = "http://localhost:3002"
 
@@ -11,6 +12,7 @@ def get_client_response(message: str,API_URL:str) -> str:
         print("Error fetching AI response:", e)
         raise RuntimeError("Failed to fetch AI response") 
 
-massage = "open notepad"
+# massage = "i want to write some text"
+massage = sys.argv[1]
 
 print(get_client_response(massage,CLIENT_API_URL))

@@ -10,28 +10,47 @@ CORS(app)  # Allow frontend requests (from React)
 
 BACKEND_API_URL = "http://localhost:3001"
 
+global pending_task
+pending_task = {}
+
+def do_client_task(analysis):
+    command = analysis['command']
+    parameters = analysis['parameters']
+    command_execute, _ = COMMANDS.get(command,"")
+    
+    if command_execute:
+        return jsonify({"reply": command_execute(**parameters)})
+    else:
+        return jsonify({"reply": "Command not found for task " + command})
+        
 @app.route("/chat", methods=["POST"])
 def chat():
+    global pending_task
     data = request.json
     user_message = data.get("message", "").strip().lower()
     
-    analysis = json.loads(get_ai_response(user_message,BACKEND_API_URL))
+    try:
+        analysis = json.loads(get_ai_response(user_message, BACKEND_API_URL))
+    except (json.JSONDecodeError, TypeError) as e:
+        return jsonify({"reply": "Sorry, I couldn't understand the response from AI."})
+
     # return jsonify({"reply": "testing"})
+    print(analysis)
     
     if 'tends_task' in analysis:
         if analysis['tends_task'] == 'True':
+            pending_task = analysis
             return jsonify({"reply": analysis['comfirmation_message']})
         else:
-            return jsonify({"reply": analysis['reply']})
+            temp_res = analysis['reply']
+            return_res = jsonify({"reply": temp_res})
+            if temp_res == "yes" and pending_task:
+                return_res = do_client_task(pending_task)
+            pending_task = {}
+            return return_res 
     else:
-        command = analysis['command']
-        parameters = analysis['parameters']
-        command_execute, _ = COMMANDS.get(command,"")
-    
-        if command_execute:
-            return jsonify({"reply": command_execute(**parameters)})
-        else:
-            return jsonify({"reply": "Command not found for task " + command})
+        pending_task = {}
+        return do_client_task(analysis=analysis)
     
     # {"command": "set alarm", "parameters": {"time": "10:00"}}
     # {"tends_task": "True", "comfirmation_massage": "Do you want to set the alarm for 07:00?", "command": "", "parameters": {}}
