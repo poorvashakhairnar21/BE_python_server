@@ -1,7 +1,7 @@
+import socket
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from backend_request import get_ai_response
-import os
 import json
 from assitant_client.commands import COMMANDS
 
@@ -56,5 +56,15 @@ def chat():
     # {"tends_task": "True", "comfirmation_massage": "Do you want to set the alarm for 07:00?", "command": "", "parameters": {}}
     # {"tends_task": "False", "reply": "I'm good, how can I assist you?"}
 
+# if __name__ == "__main__":
+#     app.run(debug=True, host="0.0.0.0", port=3002)
+
+def find_available_port():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind(("127.0.0.1", 0))  # Bind to an available port
+        return s.getsockname()[1]
+
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=3002)
+    port = find_available_port()
+    print(f"Server starting on port {port}")
+    app.run(debug=True, host="127.0.0.1", port=port)
