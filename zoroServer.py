@@ -28,11 +28,12 @@ def chat():
     global pending_task
     data = request.json
     user_message = data.get("message", "").strip().lower()
+    user_previousChat = data.get("previousChat", "")
     
     try:
-        analysis = json.loads(get_ai_response(user_message, BACKEND_API_URL))
+        analysis = json.loads(get_ai_response(user_message,user_previousChat,BACKEND_API_URL))
     except (json.JSONDecodeError, TypeError) as e:
-        return jsonify({"reply": "Sorry, I couldn't understand the response from AI."})
+        return jsonify({"reply": "Sorry, I couldn't understand ,the response from AI."})
 
     # return jsonify({"reply": "testing"})
     print(analysis)
@@ -66,5 +67,6 @@ def find_available_port():
 
 if __name__ == "__main__":
     port = find_available_port()
+    # port=3002
     print(f"Server starting on port {port}")
     app.run(debug=True, host="127.0.0.1", port=port)
