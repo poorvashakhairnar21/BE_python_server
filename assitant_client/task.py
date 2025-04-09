@@ -20,7 +20,7 @@ def set_alarm(alarm_time:str):
         while True:
             now = datetime.now()
             if now.hour == hour and now.minute == minute:
-                print("⏰ Alarm ringing!")
+                # print("⏰ Alarm ringing!")
                 for _ in range(5):  # Beeps 5 times
                     winsound.Beep(1000, 1000)
                 break
